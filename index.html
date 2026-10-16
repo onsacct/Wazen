@@ -320,10 +320,6 @@
             <label class="chip"><input type="radio" name="ageBand" value="35+"><span>35 فأكثر</span></label>
           </div>
         </div>
-        <div class="field" id="fGrade">
-          <label for="grade">المرحلة الدراسية<span class="req-star">*</span></label>
-          <select id="grade" name="grade"></select>
-        </div>
       </div>
     </section>
 
@@ -344,6 +340,11 @@
             <label class="chip"><input type="radio" name="status" value="عمل"><span>عمل</span></label>
             <label class="chip"><input type="radio" name="status" value="باحث عن عمل"><span>باحث عن عمل</span></label>
           </div>
+        </div>
+        <!-- تظهر فقط عند اختيار "مدرسة" في الوضع الحالي -->
+        <div class="field" id="fGrade" style="display:none;">
+          <label for="grade">المرحلة الدراسية<span class="req-star">*</span></label>
+          <select id="grade" name="grade"></select>
         </div>
         <div class="field">
           <label>هل تملك جهازاً شخصياً؟</label>
@@ -733,13 +734,27 @@
     form.querySelectorAll('input[type=radio]').forEach(r=>radioNames.add(r.name));
     let answered = 0;
     radioNames.forEach(n=>{ if(form.querySelector(`input[name="${n}"]:checked`)) answered++; });
-    if(gradeSelect.value) answered++;
-    const pct = Math.round((answered/(radioNames.size + 1))*100);
+    const gradeShown = document.getElementById('fGrade').style.display !== 'none';
+    if(gradeShown && gradeSelect.value) answered++;
+    const pct = Math.round((answered/(radioNames.size + (gradeShown ? 1 : 0)))*100);
     document.getElementById('progressFill').style.width = pct+'%';
     document.getElementById('progressText').textContent = pct+'% مكتمل';
   }
   form.addEventListener('change', updateProgress);
   updateProgress();
+
+  // المرحلة الدراسية تظهر فقط إذا كان الوضع الحالي "مدرسة"، وتُفرّغ إذا أُخفيت
+  function isSchool(){
+    return ((form.querySelector('input[name="status"]:checked')||{}).value || '') === 'مدرسة';
+  }
+  function syncGrade(){
+    const box = document.getElementById('fGrade');
+    const show = isSchool();
+    box.style.display = show ? '' : 'none';
+    if(!show){ gradeSelect.value = ''; box.classList.remove('missing'); }
+    updateProgress();
+  }
+  form.querySelectorAll('input[name="status"]').forEach(r=>r.addEventListener('change', syncGrade));
 
   // إزالة التظليل الأحمر بمجرد أن يجيب المشارك على الحقل
   function clearMissing(e){
@@ -782,8 +797,8 @@
     const need = (ok, el)=>{ if(!ok && el){ missing.push(el); el.classList.add('missing'); } };
     need(!!form.querySelector('input[name="ageBand"]:checked'), document.getElementById('fAgeBand'));
     const ageVal = document.getElementById('age').value.trim();
-    need(document.getElementById('grade').value !== '', document.getElementById('fGrade'));
     need(!ageVal || (+ageVal >= 6 && +ageVal <= 100), document.getElementById('age').closest('.field'));
+    if(isSchool()) need(document.getElementById('grade').value !== '', document.getElementById('fGrade'));
     [...indicatorKeys.map(k=>k.name), ...skillKeys].forEach(n=>{
       need(!!form.querySelector(`input[name="${n}"]:checked`), form.querySelector(`.likert-item[data-q="${n}"]`));
     });
@@ -878,11 +893,11 @@
     // بيانات الاستبيان
     entry['تاريخ التعبئة'] = val('fillDate');
     entry['الفئة العمرية'] = radioVal('ageBand');
-    entry['المرحلة الدراسية'] = val('grade');
 
     // أولاً: معلومات أساسية
     entry['العمر (سنة)'] = val('age');
     entry['الوضع الحالي'] = radioVal('status');
+    entry['المرحلة الدراسية'] = isSchool() ? val('grade') : '';
     entry['هل تملك جهازاً شخصياً؟'] = radioVal('ownsDevice');
     entry['أكثر قناة رقمية تستخدمها ترفيهياً'] = radioVal('topChannel');
     entry['هل توجد قواعد أو اتفاقات شخصية/أسرية لاستخدام الشاشات؟'] = radioVal('familyRules');
@@ -967,7 +982,7 @@
     formError.classList.remove('show');
     document.getElementById('savedNote').textContent = '';
     setDefaultDate();
-    recalcUsage(); recalcApps(); updateProgress();
+    recalcUsage(); recalcApps(); syncGrade();
     document.getElementById('results').style.display='none';
     document.querySelectorAll('section.card').forEach(s=>s.style.display='block');
     document.getElementById('formSubmitRow').style.display='flex';
