@@ -689,7 +689,7 @@
     indicatorWrap.appendChild(h);
     dom.items.forEach(text=>{
       const name = 'ind'+qn;
-      indicatorKeys.push({name, domain: dom.name});
+      indicatorKeys.push({name, domain: dom.name, text});
       const row = document.createElement('div');
       row.className = 'likert-item';
       row.dataset.q = name;
@@ -868,68 +868,75 @@
     document.getElementById('subSkills').textContent = skillsTotal;
     document.getElementById('subMinutes').textContent = entertainmentAvg;
 
-    const entry = {
-      fillDate: document.getElementById('fillDate').value.trim(),
-      ageBand: (form.querySelector('input[name="ageBand"]:checked')||{}).value || '',
-      age: document.getElementById('age').value.trim(),
-      status: (form.querySelector('input[name="status"]:checked')||{}).value || '',
-      ownsDevice: (form.querySelector('input[name="ownsDevice"]:checked')||{}).value || '',
-      topChannel: (form.querySelector('input[name="topChannel"]:checked')||{}).value || '',
-      familyRules: (form.querySelector('input[name="familyRules"]:checked')||{}).value || '',
-      scoreTotal, verdictLabel: verdict.label, skillsTotal,
-      subControl: subs['ضعف التحكم'],
-      subLifeImpact: subs['تأثير الاستخدام في الحياة'],
-      subMoodUse: subs['استخدام الشاشة للمزاج'],
-      subPersistence: subs['الاستمرار رغم النتائج'],
-      entertainmentAvgMinutes: entertainmentAvg,
-      topAppName: document.getElementById('topAppName').textContent,
-      topAppAvgMinutes: document.getElementById('topAppAvg').textContent,
-      appsTotalAvgMinutes: document.getElementById('appsTotalAvg').textContent,
-      planActivity: document.getElementById('planActivity').value.trim(),
-      planZone: document.getElementById('planZone').value.trim(),
-      planStep: document.getElementById('planStep').value.trim(),
-      planSupport: document.getElementById('planSupport').value.trim(),
-      savedAt: Date.now()
-    };
-    indicatorKeys.forEach(({name})=>{
-      const checked = form.querySelector(`input[name="${name}"]:checked`);
-      entry[name] = checked ? checked.value : '';
-    });
-    skillKeys.forEach(name=>{
-      const checked = form.querySelector(`input[name="${name}"]:checked`);
-      entry[name] = checked ? checked.value : '';
-    });
+    // ===== بيانات الاستجابة: كل عمود في الجدول يحمل نفس العنوان العربي الظاهر في الصفحة، وبنفس ترتيب الصفحة =====
+    const radioVal = n => (form.querySelector(`input[name="${n}"]:checked`)||{}).value || '';
+    const val = id => (document.getElementById(id).value || '').trim();
+    const labelOf = id => document.querySelector(`label[for="${id}"]`).textContent.trim();
+    const headsOf = id => [...document.querySelectorAll(`#${id} thead th`)].map(th => th.textContent.trim());
+    const entry = {};
 
-    // تفاصيل جدول القناة/النشاط (كل صف على حدة)
+    // بيانات الاستبيان
+    entry['تاريخ التعبئة'] = val('fillDate');
+    entry['الفئة العمرية'] = radioVal('ageBand');
+    entry['المرحلة الدراسية'] = val('grade');
+
+    // أولاً: معلومات أساسية
+    entry['العمر (سنة)'] = val('age');
+    entry['الوضع الحالي'] = radioVal('status');
+    entry['هل تملك جهازاً شخصياً؟'] = radioVal('ownsDevice');
+    entry['أكثر قناة رقمية تستخدمها ترفيهياً'] = radioVal('topChannel');
+    entry['هل توجد قواعد أو اتفاقات شخصية/أسرية لاستخدام الشاشات؟'] = radioVal('familyRules');
+
+    // جدول القناة / النشاط
+    const uH = headsOf('usageTable');
     usageRows.forEach(r=>{
-      entry[`usage_${r.key}_study`] = (document.querySelector(`.u-study[data-key="${r.key}"]`).value || '').trim();
-      entry[`usage_${r.key}_holiday`] = (document.querySelector(`.u-holiday[data-key="${r.key}"]`).value || '').trim();
-      entry[`usage_${r.key}_avg`] = document.querySelector(`.u-avg[data-key="${r.key}"]`).textContent.trim();
+      entry[`${r.label} — ${uH[1]}`] = (document.querySelector(`.u-study[data-key="${r.key}"]`).value || '').trim();
+      entry[`${r.label} — ${uH[2]}`] = (document.querySelector(`.u-holiday[data-key="${r.key}"]`).value || '').trim();
+      entry[`${r.label} — ${uH[3]}`] = document.querySelector(`.u-avg[data-key="${r.key}"]`).textContent.trim();
     });
 
-    // تفاصيل جدول التطبيقات الخمسة (كل تطبيق على حدة)
+    // سجل التطبيقات الخمسة
+    const aH = headsOf('appsTable');
     [...appsBody.querySelectorAll('tr')].forEach((tr, i)=>{
-      const n = i+1;
-      entry[`app${n}_name`] = tr.querySelector('.a-name').value.trim();
-      entry[`app${n}_type`] = tr.querySelector('.a-type').value;
-      entry[`app${n}_study`] = (tr.querySelector('.a-study').value || '').trim();
-      entry[`app${n}_holiday`] = (tr.querySelector('.a-holiday').value || '').trim();
-      entry[`app${n}_avg`] = tr.querySelector('.a-avg').textContent.trim();
-      entry[`app${n}_goal`] = tr.querySelector('.a-goal').value;
+      const p = `التطبيق ${i+1} — `;
+      entry[p + aH[1]] = tr.querySelector('.a-name').value.trim();
+      entry[p + aH[2]] = tr.querySelector('.a-type').value;
+      entry[p + aH[3]] = (tr.querySelector('.a-study').value || '').trim();
+      entry[p + aH[4]] = (tr.querySelector('.a-holiday').value || '').trim();
+      entry[p + aH[5]] = tr.querySelector('.a-avg').textContent.trim();
+      entry[p + aH[6]] = tr.querySelector('.a-goal').value;
     });
+    entry['التطبيق أو المنصة الأكثر استخداماً'] = document.getElementById('topAppName').textContent;
+    entry['متوسطه اليومي (دقيقة)'] = document.getElementById('topAppAvg').textContent;
+    entry['إجمالي متوسط الاستخدام اليومي لجميع التطبيقات المذكورة (دقيقة)'] = document.getElementById('appsTotalAvg').textContent;
 
-    // تفاصيل جدول سجل السبعة أيام (كل يوم × كل نشاط)
-    const weekDayKeys = ['sun','mon','tue','wed','thu','fri','sat']; // بنفس ترتيب days (الأحد أولاً)
-    const weekColKeys = ['mobile','games','tv','study','other'];
+    // سجل سبعة أيام
+    const wH = headsOf('weekTable');
     [...weekBody.querySelectorAll('tr')].forEach((tr, di)=>{
       [...tr.querySelectorAll('.w-cell')].forEach((cell, ci)=>{
-        entry[`week_${weekDayKeys[di]}_${weekColKeys[ci]}`] = (cell.value || '').trim();
+        entry[`${days[di]} — ${wH[ci+1]}`] = (cell.value || '').trim();
       });
     });
 
-    // حقول جديدة: أُضيفت في نهاية الكائن حتى لا تُزاح أعمدة الورقة القديمة
-    entry.grade = document.getElementById('grade').value;
-    entry.responseId = makeId();
+    // ثانياً: مقياس المؤشرات (20 عبارة)
+    indicatorKeys.forEach(({name, text}, i)=>{ entry[`مؤشر ${i+1}. ${text}`] = radioVal(name); });
+
+    // ثالثاً: مقياس المهارات (6 عبارات)
+    skillKeys.forEach((name, i)=>{ entry[`مهارة ${i+1}. ${skillItems[i]}`] = radioVal(name); });
+
+    // رابعاً: خطة توازني
+    ['planActivity','planZone','planStep','planSupport'].forEach(id=>{ entry[labelOf(id)] = val(id); });
+
+    // النتيجة كما ظهرت للمشارك في شاشة "نتيجتك"
+    entry['نتيجتك (من 80)'] = scoreTotal;
+    entry['التصنيف'] = verdict.label;
+    entry['التوصية'] = verdict.action;
+    document.querySelectorAll('#results .subscore-card').forEach(card=>{
+      entry[card.querySelector('.label').textContent.trim()] = card.querySelector('.val').textContent.trim();
+    });
+
+    // رقم داخلي يمنع تكرار الاستجابة نفسها في الجدول
+    entry['رقم الاستجابة'] = makeId();
 
     const submitBtn = form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
