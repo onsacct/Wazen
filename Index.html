@@ -186,7 +186,6 @@
   .submit-row{ display:flex; justify-content:space-between; align-items:center; margin-top:26px; gap:12px; flex-wrap:wrap;}
   .req-hint{ font-size:12.5px; color: var(--ink-soft);}
   .req-star{ color: var(--danger); margin-inline-start:3px;}
-  .field-hint{ font-size:12px; color: var(--ink-soft); font-weight:400;}
 
   /* Validation */
   .missing{ background:#FBEDEA; border-radius:8px; box-shadow: inset -3px 0 0 var(--danger);}
@@ -217,6 +216,51 @@
   /* Admin / collected responses */
   footer.refs{ margin-top:30px; font-size:12px; color: var(--ink-soft); line-height:1.9;}
   footer.refs a{ color: var(--teal);}
+  .admin-icon{
+    position:absolute; top:14px; inset-inline-end:14px; z-index:2;
+    width:38px; height:38px; border-radius:50%; border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(255,255,255,.10); color:#DCEAE5; transition: background .15s ease, color .15s ease;
+  }
+  .admin-icon:hover{ background: rgba(255,255,255,.2); color:#fff;}
+  .admin-icon:focus-visible{ outline:2px solid var(--ochre); outline-offset:2px;}
+
+  /* Loading / closed notices */
+  .status-card{
+    background: var(--panel); border:1px solid var(--line); border-radius: var(--radius);
+    padding: 34px 26px; margin-top:22px; text-align:center;
+  }
+  .status-card h2{ font-family:'Zain','IBM Plex Sans Arabic',sans-serif; font-size:24px; color: var(--teal-dark); margin:0 0 8px;}
+  .status-card p{ margin:0; color: var(--ink-soft); font-size:14.5px;}
+  #closedNotice, #surveyForm{ display:none;}
+
+  /* Admin panel */
+  .admin-overlay{
+    position:fixed; inset:0; z-index:50; background: rgba(18,59,54,.55);
+    display:none; align-items:flex-start; justify-content:center; padding: 24px 16px; overflow-y:auto;
+  }
+  .admin-overlay.open{ display:flex;}
+  .admin-box{
+    background: var(--panel); border-radius: var(--radius); width:100%; max-width: 460px;
+    padding: 22px 22px 20px; box-shadow: 0 12px 40px rgba(0,0,0,.18);
+  }
+  .admin-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;}
+  .admin-head h2{ font-family:'Zain','IBM Plex Sans Arabic',sans-serif; font-size:22px; color: var(--teal-dark); margin:0;}
+  .admin-close{ background:none; border:none; font-size:26px; line-height:1; color: var(--ink-soft); cursor:pointer; padding:4px 8px;}
+  .admin-box .field{ margin-bottom:16px;}
+  .admin-box input[type=password]{
+    font-family: inherit; font-size: 18px; letter-spacing: 4px; text-align:center; padding: 10px 12px;
+    border: 1px solid var(--line); border-radius: 7px; background:#FCFCFB; width:100%;
+  }
+  .admin-msg{ font-size:13px; min-height: 20px; margin-top:8px; color: var(--ink-soft);}
+  .admin-msg.err{ color: var(--danger); font-weight:600;}
+  .admin-msg.ok{ color: var(--teal); font-weight:600;}
+  .mini-actions{ display:flex; gap:14px; margin-top:8px;}
+  .mini-actions button{ background:none; border:none; padding:0; font-family:inherit; font-size:12.5px; color: var(--teal); text-decoration: underline; cursor:pointer;}
+  .admin-box input[type=password]::placeholder{ letter-spacing:0; font-size:13px;}
+  .admin-sep{ border-top:1px solid var(--line); margin: 18px 0 16px;}
+  .admin-box .btn{ width:100%;}
+  .admin-box .btn:disabled{ opacity:.6; cursor:default;}
 
   @media (max-width: 640px){
     .field-grid{ grid-template-columns: 1fr;}
@@ -231,17 +275,28 @@
 
   <div class="masthead">
     <div class="scale-mark"></div>
+    <button type="button" class="admin-icon" id="adminOpen" aria-label="دخول المشرف" title="دخول المشرف">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
     <div class="eyebrow-line">برنامج وازن للتوازن الرقمي</div>
     <h1>استبيان قَبلي وبَعدي للاستخدام الرقمي</h1>
-    <p class="sub">للناشئة والبالغين من عمر 15 سنة فأكثر — أداة فرز وتقييم تربوي لمتابعة نمط استخدام الجوال والألعاب والتلفاز والقنوات الرقمية قبل برنامج التوازن الرقمي وبعده.</p>
+    <p class="sub">للناشئة والبالغين — أداة فرز وتقييم تربوي لمتابعة نمط استخدام الجوال والألعاب والتلفاز والقنوات الرقمية قبل برنامج التوازن الرقمي وبعده.</p>
     <div class="purpose-box">
-      هذه أداة فرز وتقييم تربوي، وليست تشخيصاً طبياً أو نفسياً، ولا تثبت وجود إدمان بمفردها. يعبّئ المشارك الاستبيان ذاتياً، ويمكن لمن عمره 15–17 سنة طلب توضيح لغوي عند الحاجة.
+      هذه أداة فرز وتقييم تربوي، وليست تشخيصاً طبياً أو نفسياً، ولا تثبت وجود إدمان بمفردها. يعبّئ المشارك الاستبيان ذاتياً، ويمكن لمن عمره أقل من 18 سنة طلب توضيح لغوي عند الحاجة.
     </div>
   </div>
 
   <div class="progress-shell">
     <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
     <div class="progress-label"><span id="progressText">0% مكتمل</span><span>خمس دقائق تقريباً</span></div>
+  </div>
+
+  <div class="status-card" id="loadingNotice">
+    <p>جارٍ تحميل الاستبيان...</p>
+  </div>
+  <div class="status-card" id="closedNotice">
+    <h2>الاستبيان مغلق حالياً</h2>
+    <p>لا يستقبل الاستبيان إجابات في الوقت الحالي. حاول لاحقاً أو تواصل مع الجهة المنظمة.</p>
   </div>
 
   <form id="surveyForm" novalidate>
@@ -251,18 +306,6 @@
       <div class="sec-kicker">بيانات التعريف</div>
       <h2 class="sec-title">بيانات الاستبيان</h2>
       <div class="field-grid">
-        <div class="field" id="fPhase">
-          <label>نوع التطبيق<span class="req-star">*</span></label>
-          <div class="chip-group" data-name="phase">
-            <label class="chip"><input type="radio" name="phase" value="قبلي"><span>قبلي (قبل البرنامج)</span></label>
-            <label class="chip"><input type="radio" name="phase" value="بعدي"><span>بعدي (بعد البرنامج)</span></label>
-          </div>
-        </div>
-        <div class="field" id="fCode">
-          <label for="participantCode">رمز المشارك<span class="req-star">*</span>
-            <span class="field-hint">— رمز تختاره وتكتبه نفسه في المرتين (القبلي والبعدي)، مثل: أول حرفين من اسمك + يوم ميلادك</span></label>
-          <input type="text" id="participantCode" name="participantCode" maxlength="20" autocomplete="off" placeholder="مثال: سع14">
-        </div>
         <div class="field">
           <label for="fillDate">تاريخ التعبئة</label>
           <input type="date" id="fillDate" name="fillDate">
@@ -270,11 +313,16 @@
         <div class="field" id="fAgeBand">
           <label>الفئة العمرية<span class="req-star">*</span></label>
           <div class="chip-group" data-name="ageBand">
+            <label class="chip"><input type="radio" name="ageBand" value="14 أو أقل"><span>14 أو أقل</span></label>
             <label class="chip"><input type="radio" name="ageBand" value="15-17"><span>15–17</span></label>
             <label class="chip"><input type="radio" name="ageBand" value="18-24"><span>18–24</span></label>
             <label class="chip"><input type="radio" name="ageBand" value="25-34"><span>25–34</span></label>
             <label class="chip"><input type="radio" name="ageBand" value="35+"><span>35 فأكثر</span></label>
           </div>
+        </div>
+        <div class="field" id="fGrade">
+          <label for="grade">المرحلة الدراسية<span class="req-star">*</span></label>
+          <select id="grade" name="grade"></select>
         </div>
       </div>
     </section>
@@ -286,7 +334,7 @@
       <div class="field-grid">
         <div class="field">
           <label for="age">العمر (سنة)</label>
-          <input type="number" id="age" name="age" min="15" max="100">
+          <input type="number" id="age" name="age" min="6" max="100">
         </div>
         <div class="field">
           <label>الوضع الحالي</label>
@@ -441,11 +489,82 @@
 
 </div>
 
+<!-- Admin panel -->
+<div class="admin-overlay" id="adminOverlay" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+  <div class="admin-box">
+    <div class="admin-head">
+      <h2 id="adminTitle">لوحة المشرف</h2>
+      <button type="button" class="admin-close" id="adminClose" aria-label="إغلاق">×</button>
+    </div>
+
+    <div id="adminLogin">
+      <div class="field">
+        <label for="adminPin">رمز الدخول (PIN)</label>
+        <input type="password" id="adminPin" inputmode="numeric" autocomplete="off" maxlength="12">
+      </div>
+      <button type="button" class="btn btn-primary" id="adminLoginBtn">دخول</button>
+      <div class="admin-msg" id="adminLoginMsg"></div>
+    </div>
+
+    <div id="adminSettings" style="display:none;">
+      <div class="field">
+        <label>حالة الاستبيان</label>
+        <div class="chip-group">
+          <label class="chip"><input type="radio" name="adminEnabled" value="1"><span>مفتوح للإجابة</span></label>
+          <label class="chip"><input type="radio" name="adminEnabled" value="0"><span>مغلق</span></label>
+        </div>
+      </div>
+      <div class="field">
+        <label>المراحل الظاهرة في القائمة</label>
+        <div class="chip-group" id="adminGrades"></div>
+        <div class="mini-actions">
+          <button type="button" id="adminAll">تحديد الكل</button>
+          <button type="button" id="adminNone">إلغاء الكل</button>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" id="adminSaveBtn">حفظ الإعدادات</button>
+      <div class="admin-msg" id="adminSaveMsg"></div>
+
+      <div class="admin-sep"></div>
+      <div class="field">
+        <label for="newPin">تغيير رمز الدخول</label>
+        <input type="password" id="newPin" inputmode="numeric" autocomplete="new-password" maxlength="12" placeholder="الرمز الجديد (من 4 إلى 12 رقماً)">
+        <input type="password" id="newPin2" inputmode="numeric" autocomplete="new-password" maxlength="12" placeholder="أعد كتابة الرمز الجديد">
+      </div>
+      <button type="button" class="btn btn-ghost" id="changePinBtn">تغيير الرمز</button>
+      <div class="admin-msg" id="pinMsg"></div>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
   // رابط Google Apps Script Web App الذي يستقبل الاستجابات ويحفظها في Google Sheets.
   // يجب أن يحتوي السكربت على الدالة doPost وأن يُنشر بصلاحية "Anyone".
   const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyZ2ZjiYlEOga__NpknwTpDif4EP8Qc12U1I0GKwu003Ny74Sgdl8Y6BfbvfgLr-sU1/exec';
+
+  // قائمة المراحل الدراسية — المشرف يختار أيها يظهر للمشاركين من لوحة المشرف
+  const GRADES = [
+    {code:'02', label:'02 - الصف الثاني الابتدائي'},
+    {code:'03', label:'03 - الصف الثالث الابتدائي'},
+    {code:'04', label:'04 - الصف الرابع الابتدائي'},
+    {code:'05', label:'05 - الصف الخامس الابتدائي'},
+    {code:'06', label:'06 - الصف السادس الابتدائي'},
+    {code:'07', label:'07 - الصف الأول المتوسط'},
+    {code:'08', label:'08 - الصف الثاني المتوسط'},
+    {code:'09', label:'09 - الصف الثالث المتوسط'},
+    {code:'10', label:'10 - المرحلة الثانوية'}
+  ];
+  const gradeSelect = document.getElementById('grade');
+  // allowed = قائمة رموز المراحل المسموحة، أو null لإظهار الكل
+  function buildGradeOptions(allowed){
+    const current = gradeSelect.value;
+    const list = GRADES.filter(g => !allowed || allowed.indexOf(g.code) !== -1);
+    gradeSelect.innerHTML = '<option value="">— اختر —</option>' +
+      list.map(g => `<option value="${g.label}">${g.label}</option>`).join('');
+    if(list.some(g => g.label === current)) gradeSelect.value = current;
+  }
+  buildGradeOptions(null);
 
   const usageRows = [
     {key:'mobile', label:'الجوال أو الجهاز اللوحي: تصفح/مشاهدة ترفيهية', entertainment:true},
@@ -614,7 +733,8 @@
     form.querySelectorAll('input[type=radio]').forEach(r=>radioNames.add(r.name));
     let answered = 0;
     radioNames.forEach(n=>{ if(form.querySelector(`input[name="${n}"]:checked`)) answered++; });
-    const pct = Math.round((answered/radioNames.size)*100);
+    if(gradeSelect.value) answered++;
+    const pct = Math.round((answered/(radioNames.size + 1))*100);
     document.getElementById('progressFill').style.width = pct+'%';
     document.getElementById('progressText').textContent = pct+'% مكتمل';
   }
@@ -644,8 +764,8 @@
   // اختيار الفئة العمرية تلقائياً من العمر المكتوب حتى لا يتعارضا
   document.getElementById('age').addEventListener('input', e=>{
     const a = parseInt(e.target.value, 10);
-    if(!a || a < 15 || a > 100) return;
-    const band = a <= 17 ? '15-17' : a <= 24 ? '18-24' : a <= 34 ? '25-34' : '35+';
+    if(!a || a < 6 || a > 100) return;
+    const band = a <= 14 ? '14 أو أقل' : a <= 17 ? '15-17' : a <= 24 ? '18-24' : a <= 34 ? '25-34' : '35+';
     const r = form.querySelector(`input[name="ageBand"][value="${band}"]`);
     if(r){
       r.checked = true;
@@ -660,11 +780,10 @@
     form.querySelectorAll('.missing').forEach(el=>el.classList.remove('missing'));
     const missing = [];
     const need = (ok, el)=>{ if(!ok && el){ missing.push(el); el.classList.add('missing'); } };
-    need(!!form.querySelector('input[name="phase"]:checked'), document.getElementById('fPhase'));
-    need(document.getElementById('participantCode').value.trim().length >= 2, document.getElementById('fCode'));
     need(!!form.querySelector('input[name="ageBand"]:checked'), document.getElementById('fAgeBand'));
     const ageVal = document.getElementById('age').value.trim();
-    need(!ageVal || (+ageVal >= 15 && +ageVal <= 100), document.getElementById('age').closest('.field'));
+    need(document.getElementById('grade').value !== '', document.getElementById('fGrade'));
+    need(!ageVal || (+ageVal >= 6 && +ageVal <= 100), document.getElementById('age').closest('.field'));
     [...indicatorKeys.map(k=>k.name), ...skillKeys].forEach(n=>{
       need(!!form.querySelector(`input[name="${n}"]:checked`), form.querySelector(`.likert-item[data-q="${n}"]`));
     });
@@ -809,8 +928,7 @@
     });
 
     // حقول جديدة: أُضيفت في نهاية الكائن حتى لا تُزاح أعمدة الورقة القديمة
-    entry.phase = (form.querySelector('input[name="phase"]:checked')||{}).value || '';
-    entry.participantCode = document.getElementById('participantCode').value.trim();
+    entry.grade = document.getElementById('grade').value;
     entry.responseId = makeId();
 
     const submitBtn = form.querySelector('button[type="submit"]');
@@ -847,6 +965,184 @@
     document.querySelectorAll('section.card').forEach(s=>s.style.display='block');
     document.getElementById('formSubmitRow').style.display='flex';
     window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  // ===== إعدادات الاستبيان (فتح/إغلاق + المراحل الظاهرة) تُقرأ من السكربت =====
+  const loadingNotice = document.getElementById('loadingNotice');
+  const closedNotice = document.getElementById('closedNotice');
+  const progressShell = document.querySelector('.progress-shell');
+  let currentSettings = {enabled:true, grades:null};
+
+  function normalizeSettings(s){
+    return {
+      enabled: !(s && s.enabled === false),
+      grades: (s && Array.isArray(s.grades)) ? s.grades.map(String) : null
+    };
+  }
+  function applySettings(s){
+    currentSettings = normalizeSettings(s);
+    buildGradeOptions(currentSettings.grades);
+    updateProgress();
+    loadingNotice.style.display = 'none';
+    const open = currentSettings.enabled;
+    closedNotice.style.display = open ? 'none' : 'block';
+    form.style.display = open ? 'block' : 'none';
+    progressShell.style.display = open ? '' : 'none';
+  }
+  async function loadSettings(){
+    if(!GOOGLE_SHEETS_URL){ applySettings(null); return; }
+    const ctrl = new AbortController();
+    const timer = setTimeout(()=>ctrl.abort(), 10000);
+    try{
+      const res = await fetch(GOOGLE_SHEETS_URL + '?action=settings', {cache:'no-store', signal: ctrl.signal});
+      applySettings(await res.json());
+    }catch(err){
+      // إذا تعذّر الوصول للإعدادات يُفتح الاستبيان بكل المراحل حتى لا يتعطل المشاركون
+      applySettings(null);
+    }finally{
+      clearTimeout(timer);
+    }
+  }
+  loadSettings();
+
+  // ===== لوحة المشرف (الرمز يُتحقق منه داخل السكربت، ولا يُحفظ في هذه الصفحة) =====
+  const overlay = document.getElementById('adminOverlay');
+  const pinInput = document.getElementById('adminPin');
+  const loginBox = document.getElementById('adminLogin');
+  const settingsBox = document.getElementById('adminSettings');
+  const loginMsg = document.getElementById('adminLoginMsg');
+  const saveMsg = document.getElementById('adminSaveMsg');
+  const pinMsg = document.getElementById('pinMsg');
+  const adminGrades = document.getElementById('adminGrades');
+  let adminPin = '';
+
+  adminGrades.innerHTML = GRADES.map(g =>
+    `<label class="chip"><input type="checkbox" value="${g.code}"><span>${g.label}</span></label>`).join('');
+
+  function setMsg(el, text, kind){
+    el.textContent = text;
+    el.className = 'admin-msg' + (kind ? ' ' + kind : '');
+  }
+  function errorText(code){
+    if(code === 'wrongPin') return 'رمز الدخول غير صحيح.';
+    if(code === 'locked') return 'محاولات خاطئة كثيرة. حاول مرة أخرى بعد 10 دقائق.';
+    if(code === 'badPin') return 'الرمز الجديد يجب أن يكون من 4 إلى 12 رقماً.';
+    return 'تعذّر الاتصال بالسكربت. تأكد من الإنترنت ومن نشر النسخة الجديدة من السكربت.';
+  }
+  async function adminCall(payload){
+    const res = await fetch(GOOGLE_SHEETS_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+    return res.json();
+  }
+  function fillAdmin(s){
+    const n = normalizeSettings(s);
+    document.querySelector(`input[name="adminEnabled"][value="${n.enabled ? '1' : '0'}"]`).checked = true;
+    adminGrades.querySelectorAll('input').forEach(cb=>{
+      cb.checked = !n.grades || n.grades.indexOf(cb.value) !== -1;
+    });
+  }
+  function showAdminStep(loggedIn){
+    loginBox.style.display = loggedIn ? 'none' : 'block';
+    settingsBox.style.display = loggedIn ? 'block' : 'none';
+  }
+  function openAdmin(){
+    overlay.classList.add('open');
+    setMsg(loginMsg, ''); setMsg(saveMsg, ''); setMsg(pinMsg, '');
+    document.getElementById('newPin').value = '';
+    document.getElementById('newPin2').value = '';
+    if(adminPin){ showAdminStep(true); fillAdmin(currentSettings); }
+    else{ showAdminStep(false); pinInput.value = ''; setTimeout(()=>pinInput.focus(), 50); }
+  }
+  function closeAdmin(){ overlay.classList.remove('open'); }
+  document.getElementById('adminOpen').addEventListener('click', openAdmin);
+  document.getElementById('adminClose').addEventListener('click', closeAdmin);
+  overlay.addEventListener('click', e=>{ if(e.target === overlay) closeAdmin(); });
+  document.addEventListener('keydown', e=>{ if(e.key === 'Escape' && overlay.classList.contains('open')) closeAdmin(); });
+
+  async function adminLogin(){
+    const pin = pinInput.value.trim();
+    if(!pin){ setMsg(loginMsg, 'اكتب رمز الدخول.', 'err'); return; }
+    const btn = document.getElementById('adminLoginBtn');
+    btn.disabled = true;
+    setMsg(loginMsg, 'جارٍ التحقق...');
+    try{
+      const r = await adminCall({action: 'adminLogin', pin});
+      if(!r.ok){ setMsg(loginMsg, errorText(r.error), 'err'); return; }
+      adminPin = pin;
+      applySettings(r.settings);
+      fillAdmin(r.settings);
+      setMsg(loginMsg, '');
+      showAdminStep(true);
+    }catch(err){
+      setMsg(loginMsg, errorText(), 'err');
+    }finally{
+      btn.disabled = false;
+    }
+  }
+  document.getElementById('adminLoginBtn').addEventListener('click', adminLogin);
+  pinInput.addEventListener('keydown', e=>{ if(e.key === 'Enter'){ e.preventDefault(); adminLogin(); } });
+
+  document.getElementById('adminAll').addEventListener('click', ()=>{
+    adminGrades.querySelectorAll('input').forEach(cb=>cb.checked = true);
+  });
+  document.getElementById('adminNone').addEventListener('click', ()=>{
+    adminGrades.querySelectorAll('input').forEach(cb=>cb.checked = false);
+  });
+
+  document.getElementById('adminSaveBtn').addEventListener('click', async ()=>{
+    const enabled = (document.querySelector('input[name="adminEnabled"]:checked')||{}).value === '1';
+    const grades = [...adminGrades.querySelectorAll('input:checked')].map(cb=>cb.value);
+    if(enabled && !grades.length){
+      setMsg(saveMsg, 'اختر مرحلة واحدة على الأقل، أو اجعل الاستبيان مغلقاً.', 'err');
+      return;
+    }
+    const btn = document.getElementById('adminSaveBtn');
+    btn.disabled = true;
+    setMsg(saveMsg, 'جارٍ الحفظ...');
+    try{
+      const r = await adminCall({action: 'saveSettings', pin: adminPin, settings: {enabled, grades}});
+      if(!r.ok){
+        if(r.error === 'wrongPin'){ adminPin = ''; showAdminStep(false); setMsg(loginMsg, errorText(r.error), 'err'); return; }
+        setMsg(saveMsg, errorText(r.error), 'err');
+        return;
+      }
+      applySettings(r.settings);
+      setMsg(saveMsg, 'تم الحفظ. يظهر التغيير لكل من يفتح الصفحة من الآن.', 'ok');
+    }catch(err){
+      setMsg(saveMsg, errorText(), 'err');
+    }finally{
+      btn.disabled = false;
+    }
+  });
+
+  // تغيير رمز الدخول
+  document.getElementById('changePinBtn').addEventListener('click', async ()=>{
+    const p1 = document.getElementById('newPin');
+    const p2 = document.getElementById('newPin2');
+    const newPin = p1.value.trim();
+    if(!/^\d{4,12}$/.test(newPin)){ setMsg(pinMsg, errorText('badPin'), 'err'); return; }
+    if(newPin !== p2.value.trim()){ setMsg(pinMsg, 'الرمزان غير متطابقين.', 'err'); return; }
+    const btn = document.getElementById('changePinBtn');
+    btn.disabled = true;
+    setMsg(pinMsg, 'جارٍ التغيير...');
+    try{
+      const r = await adminCall({action: 'changePin', pin: adminPin, newPin});
+      if(!r.ok){
+        if(r.error === 'wrongPin'){ adminPin = ''; showAdminStep(false); setMsg(loginMsg, errorText(r.error), 'err'); return; }
+        setMsg(pinMsg, errorText(r.error), 'err');
+        return;
+      }
+      adminPin = newPin;
+      p1.value = ''; p2.value = '';
+      setMsg(pinMsg, 'تم تغيير الرمز. استخدم الرمز الجديد من الآن.', 'ok');
+    }catch(err){
+      setMsg(pinMsg, errorText(), 'err');
+    }finally{
+      btn.disabled = false;
+    }
   });
 
 })();
