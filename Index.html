@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>استبيان وازن للتوازن الرقمي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Zain:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EEF1EE;
+    --panel: #FFFFFF;
+    --ink: #1C2621;
+    --ink-soft: #4B5851;
+    --teal: #1F5C54;
+    --teal-dark: #123B36;
+    --teal-tint: #E1EBE8;
+    --ochre: #C98A3E;
+    --ochre-tint: #F5E6D0;
+    --line: #D8DED9;
+    --danger: #B4432F;
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+    line-height: 1.7;
+    padding-bottom: 80px;
+  }
+  .wrap{max-width: 880px; margin: 0 auto; padding: 28px 20px 60px;}
+
+  /* Header */
+  .masthead{
+    background: linear-gradient(155deg, var(--teal-dark), var(--teal) 70%);
+    color: #F3F6F3;
+    border-radius: var(--radius);
+    padding: 36px 30px 30px;
+    position: relative;
+    overflow: hidden;
+  }
+  .masthead .scale-mark{
+    position:absolute; left:-30px; top:-30px; width:160px; height:160px;
+    border: 2px solid rgba(255,255,255,.14); border-radius: 50%;
+  }
+  .masthead .scale-mark::after{
+    content:""; position:absolute; inset: 26px; border:1px solid rgba(255,255,255,.18); border-radius:50%;
+  }
+  .eyebrow-line{
+    font-size: 13px; color: #C9E6DD; margin-bottom: 10px; letter-spacing: .2px;
+  }
+  .masthead h1{
+    font-family:'Zain', 'IBM Plex Sans Arabic', sans-serif;
+    font-weight: 800;
+    font-size: 34px;
+    margin: 0 0 8px;
+  }
+  .masthead p.sub{ margin:0; font-size:15px; color:#DCEAE5; max-width: 60ch;}
+  .purpose-box{
+    margin-top: 20px; background: rgba(255,255,255,.09);
+    border-radius: 8px; padding: 14px 16px; font-size: 14px; color:#E8F1EE;
+    border-inline-start: 3px solid var(--ochre);
+  }
+
+  /* Progress */
+  .progress-shell{
+    position: sticky; top:0; z-index: 20; background: var(--bg);
+    padding: 14px 0 10px; margin-bottom: 4px;
+  }
+  .progress-track{ height:6px; background: var(--line); border-radius: 4px; overflow:hidden;}
+  .progress-fill{ height:100%; width:0%; background: var(--ochre); transition: width .3s ease;}
+  .progress-label{ font-size:12.5px; color: var(--ink-soft); margin-top:6px; display:flex; justify-content:space-between;}
+
+  /* Sections */
+  section.card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 26px 26px 24px;
+    margin-top: 22px;
+  }
+  .sec-kicker{ font-size: 13px; color: var(--teal); font-weight:600; margin-bottom:4px;}
+  .sec-title{
+    font-family:'Zain','IBM Plex Sans Arabic',sans-serif;
+    font-weight:700; font-size: 23px; margin: 0 0 14px; color: var(--teal-dark);
+  }
+  .note-box{
+    background: var(--teal-tint); border-radius:8px; padding: 12px 14px;
+    font-size: 13.5px; color: var(--ink-soft); margin-bottom: 18px;
+    border-inline-start: 3px solid var(--teal);
+  }
+  .warn-box{
+    background: var(--ochre-tint); border-radius:8px; padding: 12px 14px;
+    font-size: 13.5px; color: #6B4A1E; margin-top: 16px;
+    border-inline-start: 3px solid var(--ochre);
+  }
+
+  /* Fields */
+  .field-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px 18px;}
+  .field-grid.single{ grid-template-columns: 1fr;}
+  .field{ display:flex; flex-direction:column; gap:6px;}
+  .field label{ font-size: 13.5px; font-weight:600; color: var(--ink);}
+  .field input[type=text], .field input[type=number], .field input[type=date], .field select, .field textarea{
+    font-family: inherit; font-size: 14.5px; padding: 10px 12px;
+    border: 1px solid var(--line); border-radius: 7px; background:#FCFCFB; color: var(--ink);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline: 2px solid var(--teal); outline-offset: 1px; border-color: var(--teal);
+  }
+  .field textarea{ resize: vertical; min-height: 58px;}
+
+  .chip-group{ display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{
+    position:relative;
+  }
+  .chip input{ position:absolute; opacity:0; inset:0; cursor:pointer;}
+  .chip span{
+    display:inline-flex; align-items:center; gap:6px;
+    border:1px solid var(--line); border-radius: 999px; padding: 8px 16px;
+    font-size: 13.5px; color: var(--ink-soft); background:#FCFCFB; cursor:pointer; user-select:none;
+    transition: all .15s ease;
+  }
+  .chip input:checked + span{
+    background: var(--teal); border-color: var(--teal); color:#fff; font-weight:600;
+  }
+  .chip input:focus-visible + span{ outline:2px solid var(--ochre); outline-offset:2px;}
+
+  /* Tables */
+  .table-scroll{ overflow-x:auto; border:1px solid var(--line); border-radius:8px;}
+  table.datatable{ border-collapse: collapse; width:100%; min-width: 620px; font-size: 13.5px;}
+  table.datatable th{
+    background: var(--teal-tint); color: var(--teal-dark); font-weight:600;
+    padding: 10px 8px; text-align: center; border-bottom:1px solid var(--line);
+  }
+  table.datatable td{ padding: 7px 8px; text-align:center; border-bottom:1px solid var(--line);}
+  table.datatable td:first-child, table.datatable th:first-child{ text-align:start; padding-inline-start: 12px;}
+  table.datatable input{
+    width: 66px; text-align:center; padding:6px; border:1px solid var(--line); border-radius:6px; font-family:inherit; font-size:13.5px;
+  }
+  table.datatable input.wide{ width: 130px; text-align:start;}
+  table.datatable select{ font-size:12.5px; padding:5px; border-radius:6px; border:1px solid var(--line);}
+  .computed{ color: var(--teal-dark); font-weight:700;}
+  .total-row td{ background:#F7F5EF; font-weight:600;}
+
+  /* Likert items */
+  .domain-heading{
+    font-size: 13.5px; font-weight:700; color: var(--ochre); margin: 20px 0 6px;
+    text-transform: none;
+  }
+  .domain-heading:first-of-type{ margin-top: 4px;}
+  .likert-item{
+    display:flex; align-items:flex-start; justify-content:space-between; gap: 16px;
+    padding: 13px 4px; border-bottom: 1px solid var(--line); flex-wrap: wrap;
+  }
+  .likert-item:last-child{ border-bottom:none;}
+  .likert-q{ flex: 1 1 320px; font-size: 14.5px; padding-top: 6px;}
+  .likert-q .qnum{ color: var(--teal); font-weight:700; margin-inline-end:6px;}
+  .likert-scale{ display:flex; gap:6px; flex-shrink:0;}
+  .likert-opt{ position:relative;}
+  .likert-opt input{ position:absolute; opacity:0; inset:0; cursor:pointer; width:40px; height:40px;}
+  .likert-opt span{
+    display:flex; align-items:center; justify-content:center;
+    width:40px; height:40px; border-radius:50%; border:1.5px solid var(--line);
+    font-weight:700; font-size:14px; color: var(--ink-soft); background:#FCFCFB; cursor:pointer;
+  }
+  .likert-opt input:checked + span{ background: var(--teal); border-color:var(--teal); color:#fff;}
+  .likert-opt input:focus-visible + span{ outline:2px solid var(--ochre); outline-offset:2px;}
+  .scale-legend{
+    display:flex; flex-wrap:wrap; gap: 14px; font-size:12.5px; color: var(--ink-soft);
+    margin-bottom: 16px; background:#FAFAF7; border:1px solid var(--line); border-radius:8px; padding:10px 14px;
+  }
+  .scale-legend b{ color: var(--teal-dark);}
+
+  /* Buttons */
+  .btn{
+    font-family: inherit; font-size: 15px; font-weight:600; padding: 13px 26px;
+    border-radius: 8px; border:none; cursor:pointer; transition: transform .1s ease, background .15s ease;
+  }
+  .btn-primary{ background: var(--teal); color:#fff;}
+  .btn-primary:hover{ background: var(--teal-dark);}
+  .btn-ghost{ background:transparent; color: var(--teal); border:1.5px solid var(--teal);}
+  .btn-ghost:hover{ background: var(--teal-tint);}
+  .btn:active{ transform: scale(.98);}
+  .submit-row{ display:flex; justify-content:space-between; align-items:center; margin-top:26px; gap:12px; flex-wrap:wrap;}
+  .req-hint{ font-size:12.5px; color: var(--ink-soft);}
+  .req-star{ color: var(--danger); margin-inline-start:3px;}
+  .field-hint{ font-size:12px; color: var(--ink-soft); font-weight:400;}
+
+  /* Validation */
+  .missing{ background:#FBEDEA; border-radius:8px; box-shadow: inset -3px 0 0 var(--danger);}
+  .field.missing{ padding:8px 10px;}
+  .form-error{
+    display:none; background:#FBEDEA; color: var(--danger); border-radius:8px;
+    padding: 12px 14px; font-size:13.5px; font-weight:600; margin-top:18px;
+    border-inline-start:3px solid var(--danger);
+  }
+  .form-error.show{ display:block;}
+
+  /* Results */
+  #results{ display:none; }
+  .result-hero{
+    background: var(--teal-dark); color:#fff; border-radius: var(--radius);
+    padding: 30px; text-align:center; margin-top:22px;
+  }
+  .result-hero .big-score{ font-family:'Zain'; font-size: 52px; font-weight:800; line-height:1;}
+  .result-hero .big-score small{ font-size:20px; font-weight:500; opacity:.8;}
+  .result-hero .verdict{ display:inline-block; margin-top:10px; background: var(--ochre); color:#3A2607; font-weight:700; padding:6px 18px; border-radius:999px; font-size:14px;}
+  .result-action{ margin-top:14px; font-size:14.5px; color:#DCEAE5; max-width:56ch; margin-inline:auto;}
+  .subscore-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:20px;}
+  .subscore-card{ background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:14px 16px;}
+  .subscore-card .label{ font-size:12.5px; color:var(--ink-soft);}
+  .subscore-card .val{ font-size:22px; font-weight:700; color:var(--teal-dark); font-family:'Zain';}
+  .clinical-note{ font-size:13px; color:var(--ink-soft); margin-top:18px; background:#F7F5EF; border-radius:8px; padding:12px 14px;}
+
+  /* Admin / collected responses */
+  footer.refs{ margin-top:30px; font-size:12px; color: var(--ink-soft); line-height:1.9;}
+  footer.refs a{ color: var(--teal);}
+
+  @media (max-width: 640px){
+    .field-grid{ grid-template-columns: 1fr;}
+    .masthead h1{ font-size:26px;}
+    .likert-item{ flex-direction:column; align-items:flex-start;}
+    .subscore-grid{ grid-template-columns: 1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="scale-mark"></div>
+    <div class="eyebrow-line">برنامج وازن للتوازن الرقمي</div>
+    <h1>استبيان قَبلي وبَعدي للاستخدام الرقمي</h1>
+    <p class="sub">للناشئة والبالغين من عمر 15 سنة فأكثر — أداة فرز وتقييم تربوي لمتابعة نمط استخدام الجوال والألعاب والتلفاز والقنوات الرقمية قبل برنامج التوازن الرقمي وبعده.</p>
+    <div class="purpose-box">
+      هذه أداة فرز وتقييم تربوي، وليست تشخيصاً طبياً أو نفسياً، ولا تثبت وجود إدمان بمفردها. يعبّئ المشارك الاستبيان ذاتياً، ويمكن لمن عمره 15–17 سنة طلب توضيح لغوي عند الحاجة.
+    </div>
+  </div>
+
+  <div class="progress-shell">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label"><span id="progressText">0% مكتمل</span><span>خمس دقائق تقريباً</span></div>
+  </div>
+
+  <form id="surveyForm" novalidate>
+
+    <!-- SECTION 0: identification -->
+    <section class="card" id="sec0">
+      <div class="sec-kicker">بيانات التعريف</div>
+      <h2 class="sec-title">بيانات الاستبيان</h2>
+      <div class="field-grid">
+        <div class="field" id="fPhase">
+          <label>نوع التطبيق<span class="req-star">*</span></label>
+          <div class="chip-group" data-name="phase">
+            <label class="chip"><input type="radio" name="phase" value="قبلي"><span>قبلي (قبل البرنامج)</span></label>
+            <label class="chip"><input type="radio" name="phase" value="بعدي"><span>بعدي (بعد البرنامج)</span></label>
+          </div>
+        </div>
+        <div class="field" id="fCode">
+          <label for="participantCode">رمز المشارك<span class="req-star">*</span>
+            <span class="field-hint">— رمز تختاره وتكتبه نفسه في المرتين (القبلي والبعدي)، مثل: أول حرفين من اسمك + يوم ميلادك</span></label>
+          <input type="text" id="participantCode" name="participantCode" maxlength="20" autocomplete="off" placeholder="مثال: سع14">
+        </div>
+        <div class="field">
+          <label for="fillDate">تاريخ التعبئة</label>
+          <input type="date" id="fillDate" name="fillDate">
+        </div>
+        <div class="field" id="fAgeBand">
+          <label>الفئة العمرية<span class="req-star">*</span></label>
+          <div class="chip-group" data-name="ageBand">
+            <label class="chip"><input type="radio" name="ageBand" value="15-17"><span>15–17</span></label>
+            <label class="chip"><input type="radio" name="ageBand" value="18-24"><span>18–24</span></label>
+            <label class="chip"><input type="radio" name="ageBand" value="25-34"><span>25–34</span></label>
+            <label class="chip"><input type="radio" name="ageBand" value="35+"><span>35 فأكثر</span></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: basic info + usage pattern -->
+    <section class="card" id="sec1">
+      <div class="sec-kicker">أولاً</div>
+      <h2 class="sec-title">معلومات أساسية ونمط الاستخدام</h2>
+      <div class="field-grid">
+        <div class="field">
+          <label for="age">العمر (سنة)</label>
+          <input type="number" id="age" name="age" min="15" max="100">
+        </div>
+        <div class="field">
+          <label>الوضع الحالي</label>
+          <div class="chip-group" data-name="status">
+            <label class="chip"><input type="radio" name="status" value="مدرسة"><span>مدرسة</span></label>
+            <label class="chip"><input type="radio" name="status" value="جامعة/تدريب"><span>جامعة/تدريب</span></label>
+            <label class="chip"><input type="radio" name="status" value="عمل"><span>عمل</span></label>
+            <label class="chip"><input type="radio" name="status" value="باحث عن عمل"><span>باحث عن عمل</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>هل تملك جهازاً شخصياً؟</label>
+          <div class="chip-group" data-name="ownsDevice">
+            <label class="chip"><input type="radio" name="ownsDevice" value="نعم"><span>نعم</span></label>
+            <label class="chip"><input type="radio" name="ownsDevice" value="لا"><span>لا</span></label>
+            <label class="chip"><input type="radio" name="ownsDevice" value="أشارك جهازاً"><span>أشارك جهازاً مع آخرين</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>أكثر قناة رقمية تستخدمها ترفيهياً</label>
+          <div class="chip-group" data-name="topChannel">
+            <label class="chip"><input type="radio" name="topChannel" value="جوال/لوحي"><span>جوال/لوحي</span></label>
+            <label class="chip"><input type="radio" name="topChannel" value="ألعاب"><span>ألعاب إلكترونية</span></label>
+            <label class="chip"><input type="radio" name="topChannel" value="تلفاز/بث"><span>تلفاز/بث</span></label>
+            <label class="chip"><input type="radio" name="topChannel" value="تواصل/فيديو قصير"><span>تواصل/فيديو قصير</span></label>
+          </div>
+        </div>
+        <div class="field" style="grid-column:1/-1;">
+          <label>هل توجد قواعد أو اتفاقات شخصية/أسرية لاستخدام الشاشات؟</label>
+          <div class="chip-group" data-name="familyRules">
+            <label class="chip"><input type="radio" name="familyRules" value="نعم"><span>نعم</span></label>
+            <label class="chip"><input type="radio" name="familyRules" value="لا"><span>لا</span></label>
+            <label class="chip"><input type="radio" name="familyRules" value="غير واضحة"><span>غير واضحة</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="note-box" style="margin-top:20px;">
+        اكتب متوسط الدقائق التقريبي في اليوم. ضع الاستخدام الترفيهي في الخانات الأساسية، وسجّل الدراسة أو العمل الرقمي منفصلاً. إذا لم تُستخدم قناة، اكتب 0.
+      </div>
+      <div class="table-scroll">
+        <table class="datatable" id="usageTable">
+          <thead><tr><th>القناة / النشاط</th><th>يوم دراسة/عمل (بالدقائق)</th><th>يوم عطلة (بالدقائق)</th><th>متوسط يومي عام (بالدقائق)</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <h3 style="font-size:15px;color:var(--teal-dark);margin:22px 0 8px;">سجل التطبيقات والمنصات الأكثر استخداماً</h3>
+      <div class="note-box">اكتب أكثر خمسة تطبيقات ترفيهية استخداماً خلال آخر سبعة أيام، من الأكثر إلى الأقل.</div>
+      <div class="table-scroll">
+        <table class="datatable" id="appsTable">
+          <thead><tr><th>الترتيب</th><th>التطبيق / المنصة</th><th>النوع</th><th>يوم دراسة/عمل (بالدقائق)</th><th>يوم عطلة (بالدقائق)</th><th>متوسط يومي (بالدقائق)</th><th>الهدف الغالب</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="note-box" style="margin-top:14px;">
+        التطبيق أو المنصة الأكثر استخداماً: <b id="topAppName">—</b> · متوسطه اليومي: <b id="topAppAvg">0</b> دقيقة ·
+        إجمالي متوسط الاستخدام اليومي لجميع التطبيقات المذكورة: <b id="appsTotalAvg">0</b> دقيقة
+      </div>
+
+      <h3 style="font-size:15px;color:var(--teal-dark);margin:22px 0 8px;">سجل سبعة أيام (اختياري لكنه موصى به)</h3>
+      <div class="note-box">اكتب عدد الدقائق التقريبي لكل نشاط في ذلك اليوم (بالدقائق). إذا لم تُستخدم قناة في يوم ما، اكتب 0.</div>
+      <div class="table-scroll">
+        <table class="datatable" id="weekTable">
+          <thead><tr><th>اليوم</th><th>جوال/لوحي (بالدقائق)</th><th>ألعاب (بالدقائق)</th><th>تلفاز/بث (بالدقائق)</th><th>دراسة/عمل (بالدقائق)</th><th>رياضة/هواية/لقاء (بالدقائق)</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECTION 2: indicators scale -->
+    <section class="card" id="sec2">
+      <div class="sec-kicker">ثانياً</div>
+      <h2 class="sec-title">مقياس مؤشرات الاستخدام الرقمي المثير للمشكلات</h2>
+      <div class="note-box">ضع إجابة واحدة لكل عبارة وفق ما حدث خلال آخر 30 يوماً.</div>
+      <div class="scale-legend">
+        <span><b>0</b> أبداً</span><span><b>1</b> نادراً</span><span><b>2</b> أحياناً</span><span><b>3</b> غالباً</span><span><b>4</b> دائماً أو تقريباً كل يوم</span>
+      </div>
+      <div id="indicatorItems"></div>
+      <div class="warn-box">هذه الدرجات مخصصة للفرز التربوي وقياس التغير داخل البرنامج. لا تُستخدم لتسمية الشخص بـ«مدمن» ولا كبديل عن التشخيص السريري.</div>
+    </section>
+
+    <!-- SECTION 3: skills scale -->
+    <section class="card" id="sec3">
+      <div class="sec-kicker">ثالثاً</div>
+      <h2 class="sec-title">مقياس معرفة ومهارات التوازن الرقمي</h2>
+      <div class="scale-legend">
+        <span><b>0</b> لا أعرف / لا أستطيع بعد</span><span><b>1</b> أعرف قليلاً / أحتاج دعماً</span><span><b>2</b> أستطيع غالباً</span><span><b>3</b> أستطيع بثبات</span>
+      </div>
+      <div id="skillItems"></div>
+    </section>
+
+    <!-- SECTION 4: plan -->
+    <section class="card" id="sec4">
+      <div class="sec-kicker">رابعاً</div>
+      <h2 class="sec-title">خطة توازني للأسبوع القادم</h2>
+      <div class="field-grid single">
+        <div class="field">
+          <label for="planActivity">نشاط واقعي سأختاره عند الملل أو التوتر</label>
+          <textarea id="planActivity" name="planActivity"></textarea>
+        </div>
+        <div class="field">
+          <label for="planZone">وقت أو مكان خالٍ من الشاشات سأحميه</label>
+          <textarea id="planZone" name="planZone"></textarea>
+        </div>
+        <div class="field">
+          <label for="planStep">خطوة واحدة لحماية النوم أو الدراسة أو العمل</label>
+          <textarea id="planStep" name="planStep"></textarea>
+        </div>
+        <div class="field">
+          <label for="planSupport">شخص أو خدمة أطلب منها الدعم إن صعب علي التوقف</label>
+          <textarea id="planSupport" name="planSupport"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <div class="form-error" id="formError" role="alert"></div>
+    <div class="submit-row" id="formSubmitRow">
+      <span class="req-hint">الحقول المعلّمة بـ <span class="req-star">*</span> وجميع عبارات المقياسين مطلوبة.</span>
+      <button type="submit" class="btn btn-primary">إرسال الاستبيان وعرض النتيجة</button>
+    </div>
+  </form>
+
+  <div id="results">
+    <div class="result-hero">
+      <div class="eyebrow-line" style="color:#B9DCD2;">نتيجتك</div>
+      <div class="big-score"><span id="scoreTotal">0</span><small> / 80</small></div>
+      <div class="verdict" id="verdictLabel">—</div>
+      <p class="result-action" id="verdictAction"></p>
+    </div>
+    <div class="subscore-grid">
+      <div class="subscore-card"><div class="label">ضعف التحكم (من 20)</div><div class="val" id="subA">0</div></div>
+      <div class="subscore-card"><div class="label">تأثير الحياة (من 20)</div><div class="val" id="subB">0</div></div>
+      <div class="subscore-card"><div class="label">استخدام الشاشة للمزاج (من 16)</div><div class="val" id="subC">0</div></div>
+      <div class="subscore-card"><div class="label">الاستمرار رغم النتائج (من 24)</div><div class="val" id="subD">0</div></div>
+      <div class="subscore-card"><div class="label">مهارات التوازن الرقمي (من 18)</div><div class="val" id="subSkills">0</div></div>
+      <div class="subscore-card"><div class="label">إجمالي المتوسط اليومي الترفيهي (دقيقة)</div><div class="val" id="subMinutes">0</div></div>
+    </div>
+    <div class="clinical-note">
+      تُستخدم الدرجة لبدء حوار وخطة توازن، لا لإطلاق حكم على الشخص. ارتفاع الوقت وحده لا يثبت مشكلة، وانخفاض الوقت وحده لا يكفي إن بقي النوم أو الدراسة أو العمل أو العلاقات متأثراً. عند وجود تأثير شديد أو متواصل، ناقش الأمر مع مختص صحة نفسية مرخّص أو طبيب أو مرشد مؤهل.
+    </div>
+    <div class="submit-row">
+      <span class="req-hint" id="savedNote"></span>
+      <button type="button" class="btn btn-ghost" id="newResponseBtn">تعبئة استجابة جديدة</button>
+    </div>
+  </div>
+
+
+  <footer class="refs">
+    المراجع المهنية: منظمة الصحة العالمية — Gaming Disorder FAQ · الأكاديمية الأمريكية لطب الأطفال — Problematic Media Use Screening and Intervention Tools · الأكاديمية الأمريكية لطب الأطفال — Screen Time Guidelines. هذه الأداة أداة فرز تربوية مستلهمة من هذه المصادر، وليست بديلاً عن استبيان مقنن أو تقييم سريري.
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  // رابط Google Apps Script Web App الذي يستقبل الاستجابات ويحفظها في Google Sheets.
+  // يجب أن يحتوي السكربت على الدالة doPost وأن يُنشر بصلاحية "Anyone".
+  const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyZ2ZjiYlEOga__NpknwTpDif4EP8Qc12U1I0GKwu003Ny74Sgdl8Y6BfbvfgLr-sU1/exec';
+
+  const usageRows = [
+    {key:'mobile', label:'الجوال أو الجهاز اللوحي: تصفح/مشاهدة ترفيهية', entertainment:true},
+    {key:'games', label:'الألعاب الإلكترونية (جهاز / جوال / إنترنت)', entertainment:true},
+    {key:'tv', label:'التلفاز أو البث الترفيهي', entertainment:true},
+    {key:'social', label:'منصات التواصل أو الفيديو القصير', entertainment:true},
+    {key:'study', label:'دراسة / عمل / تدريب رقمي (يسجل منفصلاً)', entertainment:false},
+  ];
+
+  const usageBody = document.querySelector('#usageTable tbody');
+  usageRows.forEach(r=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${r.label}</td>
+      <td><input type="number" min="0" class="u-study" data-key="${r.key}"></td>
+      <td><input type="number" min="0" class="u-holiday" data-key="${r.key}"></td>
+      <td class="computed u-avg" data-key="${r.key}">0</td>`;
+    usageBody.appendChild(tr);
+  });
+  const totalTr = document.createElement('tr');
+  totalTr.className = 'total-row';
+  totalTr.innerHTML = `<td>إجمالي الاستخدام الترفيهي (دون الدراسة/العمل)</td>
+    <td class="computed" id="totStudy">0</td><td class="computed" id="totHoliday">0</td><td class="computed" id="totAvg">0</td>`;
+  usageBody.appendChild(totalTr);
+
+  function recalcUsage(){
+    let sStudy=0,sHoliday=0,sAvg=0;
+    usageRows.forEach(r=>{
+      const study = parseFloat(document.querySelector(`.u-study[data-key="${r.key}"]`).value)||0;
+      const holiday = parseFloat(document.querySelector(`.u-holiday[data-key="${r.key}"]`).value)||0;
+      const avg = Math.round((study*5 + holiday*2)/7);
+      document.querySelector(`.u-avg[data-key="${r.key}"]`).textContent = avg;
+      if(r.entertainment){ sStudy+=study; sHoliday+=holiday; sAvg+=avg; }
+    });
+    document.getElementById('totStudy').textContent = sStudy;
+    document.getElementById('totHoliday').textContent = sHoliday;
+    document.getElementById('totAvg').textContent = sAvg;
+    return sAvg;
+  }
+  usageBody.addEventListener('input', recalcUsage);
+
+  // Apps table
+  const appsBody = document.querySelector('#appsTable tbody');
+  for(let i=1;i<=5;i++){
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i}</td>
+      <td><input type="text" class="wide a-name" placeholder="اسم التطبيق"></td>
+      <td><select class="a-type">
+            <option value="">—</option>
+            <option>تواصل</option><option>فيديو قصير</option><option>مشاهدة</option><option>ألعاب</option><option>أخرى</option>
+          </select></td>
+      <td><input type="number" min="0" class="a-study"></td>
+      <td><input type="number" min="0" class="a-holiday"></td>
+      <td class="computed a-avg">0</td>
+      <td><select class="a-goal"><option value="">—</option><option>ترفيه</option><option>تواصل</option><option>أخرى</option></select></td>`;
+    appsBody.appendChild(tr);
+  }
+  function recalcApps(){
+    let rows = [...appsBody.querySelectorAll('tr')];
+    let total = 0, top = {name:'—', avg:-1};
+    rows.forEach(tr=>{
+      const study = parseFloat(tr.querySelector('.a-study').value)||0;
+      const holiday = parseFloat(tr.querySelector('.a-holiday').value)||0;
+      const avg = Math.round((study*5 + holiday*2)/7);
+      tr.querySelector('.a-avg').textContent = avg;
+      const name = tr.querySelector('.a-name').value.trim();
+      total += avg;
+      if(name && avg > top.avg){ top = {name, avg}; }
+    });
+    document.getElementById('appsTotalAvg').textContent = total;
+    document.getElementById('topAppName').textContent = top.avg >= 0 ? top.name : '—';
+    document.getElementById('topAppAvg').textContent = top.avg >= 0 ? top.avg : 0;
+  }
+  appsBody.addEventListener('input', recalcApps);
+
+  // Week table
+  const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const weekBody = document.querySelector('#weekTable tbody');
+  days.forEach(d=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${d}</td>` + '<td><input type="number" min="0" class="w-cell"></td>'.repeat(5);
+    weekBody.appendChild(tr);
+  });
+
+  // Indicator items (20)
+  const domains = [
+    {name:'ضعف التحكم', items:[
+      'أبدأ استخدام الجوال أو الألعاب أو القنوات الرقمية لمدة قصيرة، ثم أستمر أطول مما خططت.',
+      'أجد صعوبة في التوقف عندما يحين الوقت الذي قررت فيه إنهاء الاستخدام.',
+      'حاولت أن أخفف وقت الاستخدام أو أنظمه، لكنني لم أنجح كما أردت.',
+      'أتفقد الجوال أو المنصات تلقائياً من دون حاجة واضحة.',
+      'أعود سريعاً إلى الاستخدام بعد أن أقرر أخذ استراحة.'
+    ]},
+    {name:'تأثير الاستخدام في الحياة', items:[
+      'يتأخر نومي أو أستيقظ متعباً بسبب الجوال أو الألعاب أو المشاهدة.',
+      'تتأخر دراستي أو عملي أو مسؤولياتي اليومية بسبب الاستخدام الرقمي.',
+      'تقل حركتي أو رياضتي أو خروجي من المنزل لأنني أبقى أمام الشاشة.',
+      'أقضي وقتاً أقل مع العائلة أو الأصدقاء وجهاً لوجه بسبب الاستخدام الرقمي.',
+      'يتراجع تركيزي أو إنتاجيتي في اليوم التالي بعد استخدام رقمي طويل أو متأخر.'
+    ]},
+    {name:'استخدام الشاشة للمزاج', items:[
+      'ألجأ إلى الجهاز غالباً حتى أهدأ عندما أكون متوتراً أو حزيناً أو قلقاً.',
+      'أشعر بضيق أو عصبية ملحوظة عندما أحاول التوقف أو تُقطع عني الخدمة.',
+      'عندما أشعر بالملل، تكون الشاشة خياري الأول ولا أفكر في بديل مناسب.',
+      'أستخدم المنصات أو الألعاب للهروب من مشكلة أو مهمة صعبة بدلاً من التعامل معها.'
+    ]},
+    {name:'الاستمرار رغم النتائج', items:[
+      'أستمر في الاستخدام رغم ملاحظتي لأثر سلبي على النوم أو الدراسة أو العمل أو علاقتي بالآخرين.',
+      'أخفي وقت استخدامي أو أقلل منه عندما يسألني شخص قريب.',
+      'تتكرر الخلافات مع الأسرة أو الأصدقاء بسبب الجوال أو الألعاب أو المشاهدة.',
+      'أستخدم الجوال أو المنصات في مواقف تحتاج مني تركيزاً كاملاً، مثل الصف أو العمل أو الحديث المباشر.',
+      'تقل متعتي بالهوايات أو القراءة أو الرياضة أو اللقاءات لأنني أفكر في العودة إلى الشاشة.',
+      'أستمر في الاستخدام رغم حاجتي الواضحة إلى راحة ذهنية أو بدنية.'
+    ]}
+  ];
+  const indicatorWrap = document.getElementById('indicatorItems');
+  let qn = 1;
+  const indicatorKeys = []; // ordered list of {name, domain}
+  domains.forEach(dom=>{
+    const h = document.createElement('div');
+    h.className = 'domain-heading';
+    h.textContent = dom.name;
+    indicatorWrap.appendChild(h);
+    dom.items.forEach(text=>{
+      const name = 'ind'+qn;
+      indicatorKeys.push({name, domain: dom.name});
+      const row = document.createElement('div');
+      row.className = 'likert-item';
+      row.dataset.q = name;
+      row.innerHTML = `<div class="likert-q"><span class="qnum">${qn}.</span>${text}</div>
+        <div class="likert-scale">
+          ${[0,1,2,3,4].map(v=>`<label class="likert-opt"><input type="radio" name="${name}" value="${v}"><span>${v}</span></label>`).join('')}
+        </div>`;
+      indicatorWrap.appendChild(row);
+      qn++;
+    });
+  });
+
+  // Skills items (6)
+  const skillItems = [
+    'أستطيع التمييز بين الاستخدام الدراسي أو العملي وبين الاستخدام الترفيهي عند متابعة وقتي اليومي.',
+    'أستطيع تحديد وقت أو مكان يومي خالٍ من الشاشات لحماية النوم أو الدراسة أو العلاقات.',
+    'أستطيع إيقاف الإشعارات أو وضع الجهاز بعيداً عندما أحتاج إلى تركيز.',
+    'أستطيع أخذ استراحة قصيرة واختيار بديل واقعي عندما أشعر بالملل أو التوتر.',
+    'أستطيع الالتزام بوقت انتهاء متفق عليه للاستخدام الترفيهي، أو أطلب دعماً إن صعب ذلك.',
+    'أفهم أن الاستخدام المتوازن لا يقاس بعدد الساعات وحده، بل بحماية النوم والحركة والمسؤوليات والعلاقات.'
+  ];
+  const skillWrap = document.getElementById('skillItems');
+  const skillKeys = [];
+  skillItems.forEach((text,i)=>{
+    const name = 'skl'+(i+1);
+    skillKeys.push(name);
+    const row = document.createElement('div');
+    row.className = 'likert-item';
+    row.dataset.q = name;
+    row.innerHTML = `<div class="likert-q"><span class="qnum">${i+1}.</span>${text}</div>
+      <div class="likert-scale">
+        ${[0,1,2,3].map(v=>`<label class="likert-opt"><input type="radio" name="${name}" value="${v}"><span>${v}</span></label>`).join('')}
+      </div>`;
+    skillWrap.appendChild(row);
+  });
+
+  // Progress bar: count answered radio groups + key text fields vs total
+  const form = document.getElementById('surveyForm');
+  function updateProgress(){
+    const radioNames = new Set();
+    form.querySelectorAll('input[type=radio]').forEach(r=>radioNames.add(r.name));
+    let answered = 0;
+    radioNames.forEach(n=>{ if(form.querySelector(`input[name="${n}"]:checked`)) answered++; });
+    const pct = Math.round((answered/radioNames.size)*100);
+    document.getElementById('progressFill').style.width = pct+'%';
+    document.getElementById('progressText').textContent = pct+'% مكتمل';
+  }
+  form.addEventListener('change', updateProgress);
+  updateProgress();
+
+  // إزالة التظليل الأحمر بمجرد أن يجيب المشارك على الحقل
+  function clearMissing(e){
+    const box = e.target.closest('.missing');
+    if(box) box.classList.remove('missing');
+  }
+  form.addEventListener('change', clearMissing);
+  form.addEventListener('input', clearMissing);
+
+  // تاريخ التعبئة: يُعبّأ تلقائياً بتاريخ اليوم (ويمكن تعديله)
+  function todayLocal(){
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0,10);
+  }
+  function setDefaultDate(){
+    const f = document.getElementById('fillDate');
+    if(!f.value) f.value = todayLocal();
+  }
+  setDefaultDate();
+
+  // اختيار الفئة العمرية تلقائياً من العمر المكتوب حتى لا يتعارضا
+  document.getElementById('age').addEventListener('input', e=>{
+    const a = parseInt(e.target.value, 10);
+    if(!a || a < 15 || a > 100) return;
+    const band = a <= 17 ? '15-17' : a <= 24 ? '18-24' : a <= 34 ? '25-34' : '35+';
+    const r = form.querySelector(`input[name="ageBand"][value="${band}"]`);
+    if(r){
+      r.checked = true;
+      const box = r.closest('.missing');
+      if(box) box.classList.remove('missing');
+      updateProgress();
+    }
+  });
+
+  // التحقق من الحقول المطلوبة قبل الإرسال
+  function validate(){
+    form.querySelectorAll('.missing').forEach(el=>el.classList.remove('missing'));
+    const missing = [];
+    const need = (ok, el)=>{ if(!ok && el){ missing.push(el); el.classList.add('missing'); } };
+    need(!!form.querySelector('input[name="phase"]:checked'), document.getElementById('fPhase'));
+    need(document.getElementById('participantCode').value.trim().length >= 2, document.getElementById('fCode'));
+    need(!!form.querySelector('input[name="ageBand"]:checked'), document.getElementById('fAgeBand'));
+    const ageVal = document.getElementById('age').value.trim();
+    need(!ageVal || (+ageVal >= 15 && +ageVal <= 100), document.getElementById('age').closest('.field'));
+    [...indicatorKeys.map(k=>k.name), ...skillKeys].forEach(n=>{
+      need(!!form.querySelector(`input[name="${n}"]:checked`), form.querySelector(`.likert-item[data-q="${n}"]`));
+    });
+    return missing;
+  }
+
+  function makeId(){
+    if(window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+  }
+
+  // الإرسال إلى Google Sheets — ينتظر الإرسال فعلاً، ويعيد المحاولة مرة واحدة عند الفشل.
+  // keepalive يضمن اكتمال الإرسال حتى لو أغلق المشارك الصفحة مباشرة.
+  async function sendToGoogleSheets(entry){
+    if(!GOOGLE_SHEETS_URL) return true;
+    const body = JSON.stringify(entry);
+    const attempt = (keepalive)=> fetch(GOOGLE_SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      keepalive,
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body
+    });
+    try{ await attempt(true); return true; }
+    catch(err1){
+      try{ await attempt(false); return true; }
+      catch(err2){ return false; }
+    }
+  }
+
+  // Interpretation
+  function interpret(total){
+    if(total<=19) return {label:'مؤشرات منخفضة نسبياً', action:'استمر في حماية النوم والمسؤوليات والعلاقات، وراجع جودة المحتوى وهدف الاستخدام بانتظام.'};
+    if(total<=39) return {label:'مؤشرات أولية تحتاج دعماً', action:'راجع نمط الوقت، والمحفزات، والإشعارات، والبدائل، وضع اتفاقاً شخصياً أو أسرياً واضحاً للتوازن.'};
+    if(total<=59) return {label:'مؤشرات مرتفعة تحتاج متابعة منظمة', action:'نفّذ خطة أسبوعية مكتوبة، وراقب الأثر في النوم والدراسة أو العمل والحركة والعلاقات، وناقش النتيجة مع مرشد أو مختص مناسب.'};
+    return {label:'مؤشرات مرتفعة جداً', action:'يستحسن إجراء تقييم مهني أشمل من مختص صحة نفسية مرخّص أو طبيب مؤهل، خاصة عند وجود قصور واضح ومستمر في الحياة اليومية أو صعوبة شديدة في السيطرة على الاستخدام.'};
+  }
+
+  const formError = document.getElementById('formError');
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+
+    const missing = validate();
+    if(missing.length){
+      formError.textContent = `لم تكتمل الإجابة: بقي ${missing.length} من الحقول أو العبارات المظللة بالأحمر. أكملها ثم اضغط إرسال.`;
+      formError.classList.add('show');
+      missing[0].scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    formError.classList.remove('show');
+    setDefaultDate();
+
+    const entertainmentAvg = recalcUsage();
+    recalcApps();
+
+    // domain sums
+    let subs = {'ضعف التحكم':0,'تأثير الاستخدام في الحياة':0,'استخدام الشاشة للمزاج':0,'الاستمرار رغم النتائج':0};
+    let scoreTotal = 0;
+    indicatorKeys.forEach(({name,domain})=>{
+      const checked = form.querySelector(`input[name="${name}"]:checked`);
+      const val = checked ? parseInt(checked.value) : 0;
+      subs[domain]+=val; scoreTotal+=val;
+    });
+
+    let skillsTotal = 0;
+    skillKeys.forEach(name=>{
+      const checked = form.querySelector(`input[name="${name}"]:checked`);
+      skillsTotal += checked ? parseInt(checked.value) : 0;
+    });
+
+    const verdict = interpret(scoreTotal);
+
+    // populate results
+    document.getElementById('scoreTotal').textContent = scoreTotal;
+    document.getElementById('verdictLabel').textContent = verdict.label;
+    document.getElementById('verdictAction').textContent = verdict.action;
+    document.getElementById('subA').textContent = subs['ضعف التحكم'];
+    document.getElementById('subB').textContent = subs['تأثير الاستخدام في الحياة'];
+    document.getElementById('subC').textContent = subs['استخدام الشاشة للمزاج'];
+    document.getElementById('subD').textContent = subs['الاستمرار رغم النتائج'];
+    document.getElementById('subSkills').textContent = skillsTotal;
+    document.getElementById('subMinutes').textContent = entertainmentAvg;
+
+    const entry = {
+      fillDate: document.getElementById('fillDate').value.trim(),
+      ageBand: (form.querySelector('input[name="ageBand"]:checked')||{}).value || '',
+      age: document.getElementById('age').value.trim(),
+      status: (form.querySelector('input[name="status"]:checked')||{}).value || '',
+      ownsDevice: (form.querySelector('input[name="ownsDevice"]:checked')||{}).value || '',
+      topChannel: (form.querySelector('input[name="topChannel"]:checked')||{}).value || '',
+      familyRules: (form.querySelector('input[name="familyRules"]:checked')||{}).value || '',
+      scoreTotal, verdictLabel: verdict.label, skillsTotal,
+      subControl: subs['ضعف التحكم'],
+      subLifeImpact: subs['تأثير الاستخدام في الحياة'],
+      subMoodUse: subs['استخدام الشاشة للمزاج'],
+      subPersistence: subs['الاستمرار رغم النتائج'],
+      entertainmentAvgMinutes: entertainmentAvg,
+      topAppName: document.getElementById('topAppName').textContent,
+      topAppAvgMinutes: document.getElementById('topAppAvg').textContent,
+      appsTotalAvgMinutes: document.getElementById('appsTotalAvg').textContent,
+      planActivity: document.getElementById('planActivity').value.trim(),
+      planZone: document.getElementById('planZone').value.trim(),
+      planStep: document.getElementById('planStep').value.trim(),
+      planSupport: document.getElementById('planSupport').value.trim(),
+      savedAt: Date.now()
+    };
+    indicatorKeys.forEach(({name})=>{
+      const checked = form.querySelector(`input[name="${name}"]:checked`);
+      entry[name] = checked ? checked.value : '';
+    });
+    skillKeys.forEach(name=>{
+      const checked = form.querySelector(`input[name="${name}"]:checked`);
+      entry[name] = checked ? checked.value : '';
+    });
+
+    // تفاصيل جدول القناة/النشاط (كل صف على حدة)
+    usageRows.forEach(r=>{
+      entry[`usage_${r.key}_study`] = (document.querySelector(`.u-study[data-key="${r.key}"]`).value || '').trim();
+      entry[`usage_${r.key}_holiday`] = (document.querySelector(`.u-holiday[data-key="${r.key}"]`).value || '').trim();
+      entry[`usage_${r.key}_avg`] = document.querySelector(`.u-avg[data-key="${r.key}"]`).textContent.trim();
+    });
+
+    // تفاصيل جدول التطبيقات الخمسة (كل تطبيق على حدة)
+    [...appsBody.querySelectorAll('tr')].forEach((tr, i)=>{
+      const n = i+1;
+      entry[`app${n}_name`] = tr.querySelector('.a-name').value.trim();
+      entry[`app${n}_type`] = tr.querySelector('.a-type').value;
+      entry[`app${n}_study`] = (tr.querySelector('.a-study').value || '').trim();
+      entry[`app${n}_holiday`] = (tr.querySelector('.a-holiday').value || '').trim();
+      entry[`app${n}_avg`] = tr.querySelector('.a-avg').textContent.trim();
+      entry[`app${n}_goal`] = tr.querySelector('.a-goal').value;
+    });
+
+    // تفاصيل جدول سجل السبعة أيام (كل يوم × كل نشاط)
+    const weekDayKeys = ['sun','mon','tue','wed','thu','fri','sat']; // بنفس ترتيب days (الأحد أولاً)
+    const weekColKeys = ['mobile','games','tv','study','other'];
+    [...weekBody.querySelectorAll('tr')].forEach((tr, di)=>{
+      [...tr.querySelectorAll('.w-cell')].forEach((cell, ci)=>{
+        entry[`week_${weekDayKeys[di]}_${weekColKeys[ci]}`] = (cell.value || '').trim();
+      });
+    });
+
+    // حقول جديدة: أُضيفت في نهاية الكائن حتى لا تُزاح أعمدة الورقة القديمة
+    entry.phase = (form.querySelector('input[name="phase"]:checked')||{}).value || '';
+    entry.participantCode = document.getElementById('participantCode').value.trim();
+    entry.responseId = makeId();
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'جارٍ الإرسال...';
+
+    const ok = await sendToGoogleSheets(entry);
+    if(!ok){
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'إرسال الاستبيان وعرض النتيجة';
+      formError.textContent = 'تعذّر الإرسال. تحقق من اتصال الإنترنت ثم اضغط زر الإرسال مرة أخرى — إجاباتك ما زالت في الصفحة.';
+      formError.classList.add('show');
+      return;
+    }
+    document.getElementById('savedNote').textContent = 'تم إرسال إجابتك.';
+
+    document.querySelectorAll('section.card').forEach(s=>s.style.display='none');
+    document.getElementById('formSubmitRow').style.display='none';
+    document.getElementById('results').style.display='block';
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  document.getElementById('newResponseBtn').addEventListener('click', ()=>{
+    form.reset();
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'إرسال الاستبيان وعرض النتيجة';
+    form.querySelectorAll('.missing').forEach(el=>el.classList.remove('missing'));
+    formError.classList.remove('show');
+    document.getElementById('savedNote').textContent = '';
+    setDefaultDate();
+    recalcUsage(); recalcApps(); updateProgress();
+    document.getElementById('results').style.display='none';
+    document.querySelectorAll('section.card').forEach(s=>s.style.display='block');
+    document.getElementById('formSubmitRow').style.display='flex';
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+})();
+</script>
+</body>
+</html>
